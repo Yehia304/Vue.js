@@ -7,21 +7,52 @@ const app = Vue.createApp({
         return {
             playerhealth : 100,
             monsterhealth : 100,
-            currentround : 0
+            currentround : 0,
+            winner : null
         }
     },
     computed : {
         monsterbarstyles (){
+            if(this.monsterhealth <=0){
+                return '0%'
+            }
             return this.monsterhealth + '%';
         },
         playerbarstyles (){
+            if(this.playerhealth <=0){
+                return '0%'
+            }
             return this.playerhealth + '%';
         },
         mayusespecialattack(){
             return this.currentround % 3 !== 0;
         }
     },
+    watch : {
+        playerhealth(value){
+            if(value <= 0 && this.monsterhealth <= 0){
+                this.winner = 'draw'
+            }
+            else if(value <= 0){
+                this.winner = 'monster'
+            }
+        },
+        monsterhealth(value){
+            if(value <= 0 && this.playerhealth <= 0){
+                this.winner = 'draw'
+            }
+            else if(value <= 0 ){
+                this.winner = 'player'
+            }
+        }
+    },
     methods : {
+        newgame(){
+            this.playerhealth = 100,
+            this.monsterhealth = 100,
+            this.currentround = 0,
+            this.winner = null
+        },
         attackmonster(){
             this.currentround ++;
             const monsterdmg = randomcalc(12,5);
@@ -62,6 +93,9 @@ const app = Vue.createApp({
             const monsterdmg = randomcalc(10,25);
             this.monsterhealth = this.monsterhealth - monsterdmg;
             this.attackplayer();
+        },
+        surrender(){
+            this.winner = 'monster'
         }
     }
 })
